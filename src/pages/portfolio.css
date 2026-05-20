@@ -1,14 +1,25 @@
 /* src/pages/portfolio.css */
 
 .portfolio-container {
-  background-color: #080814;
+  /* Aura Gradient background as specified: hot pink/red top -> warm orange middle -> yellow-green/olive bottom */
+  background: 
+    radial-gradient(circle at 25% 15%, #FF1A6B 0%, rgba(255, 26, 107, 0) 65%),
+    radial-gradient(circle at 75% 15%, #FF4500 0%, rgba(255, 69, 0, 0) 65%),
+    radial-gradient(circle at 35% 45%, #FF6B00 0%, rgba(255, 107, 0, 0) 65%),
+    radial-gradient(circle at 75% 55%, #FF8C00 0%, rgba(255, 140, 0, 0) 65%),
+    radial-gradient(circle at 20% 85%, #AACC00 0%, rgba(170, 204, 0, 0) 60%),
+    radial-gradient(circle at 40% 90%, #88FF00 0%, rgba(136, 255, 0, 0) 55%),
+    radial-gradient(circle at 80% 85%, #CCFF00 0%, rgba(204, 255, 0, 0) 60%),
+    radial-gradient(circle at 90% 90%, #99CC00 0%, rgba(153, 204, 0, 0) 55%),
+    linear-gradient(180deg, #FF1A6B 0%, #FF6B00 50%, #AACC00 100%);
+  background-attachment: scroll;
+  background-size: cover;
+  background-repeat: no-repeat;
   color: #FFFFFF;
-  font-family: 'Space Mono', monospace;
+  font-family: 'Nunito', sans-serif;
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  selection-background-color: #FF0090;
-  selection-color: #000000;
 }
 
 /* Film Grain Overlay - 20% opacity fixed over everything */
@@ -23,238 +34,15 @@
   mix-blend-mode: overlay;
 }
 
-/* Chrome Liquid Metal Text (Molten silver/mercury with sharp drop shadow & metallic glow) */
-.chrome-text {
-  font-family: 'Syne', sans-serif;
-  font-weight: 900;
-  line-height: 0.82;
-  letter-spacing: -0.02em;
-  background: linear-gradient(
-    180deg,
-    #ffffff 0%,
-    #c0c0c0 20%,
-    #ffffff 40%,
-    #808080 60%,
-    #ffffff 75%,
-    #404040 90%,
-    #c0c0c0 100%
-  );
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  filter: drop-shadow(8px 8px 0px #000000);
-  text-shadow: 0 0 40px rgba(255, 255, 255, 0.4);
+/* Hero Glow text shadow */
+.hero-name-glow {
+  text-shadow: 0 0 60px rgba(255, 255, 255, 0.5);
 }
 
-/* Hot Pink -> Lime Green horizontal accent gradient for Tagline */
-.building-things-gradient {
-  font-family: 'Space Mono', monospace;
-  font-style: italic;
-  font-weight: bold;
-  background: linear-gradient(90deg, #FF0090, #AAFF00);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+/* Soft transition for regular text */
+a {
+  transition: opacity 0.2s ease;
 }
-
-/* Distressed / Degraded text using SVG filter */
-.distressed-text {
-  filter: url(#distress);
-}
-
-/* Saturated Neon Spray-Paint Background Blobs */
-.morphing-blob {
-  position: absolute;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 1;
-  pointer-events: none;
-  will-change: transform, border-radius;
-}
-
-.blob-pink {
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, #FF0090 0%, rgba(255, 0, 144, 0) 70%);
-  animation: morph-slow-pink 14s infinite alternate;
-}
-
-.blob-green {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, #AAFF00 0%, rgba(170, 255, 0, 0) 70%);
-  animation: morph-slow-green 18s infinite alternate-reverse;
-}
-
-.blob-blue {
-  width: 400px;
-  height: 400px;
-  background: radial-gradient(circle, #2D5BFF 0%, rgba(45, 91, 255, 0) 70%);
-  animation: morph-slow-blue 16s infinite alternate;
-}
-
-.blob-magenta {
-  width: 350px;
-  height: 350px;
-  background: radial-gradient(circle, #CC00FF 0%, rgba(204, 0, 255, 0) 70%);
-  animation: morph-slow-magenta 20s infinite alternate-reverse;
-}
-
-@keyframes morph-slow-pink {
-  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-  100% { transform: translate(6vw, -8vh) scale(1.1) rotate(60deg); }
-}
-
-@keyframes morph-slow-green {
-  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-  100% { transform: translate(-8vw, 10vh) scale(1.15) rotate(-60deg); }
-}
-
-@keyframes morph-slow-blue {
-  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-  100% { transform: translate(4vw, 5vh) scale(0.9) rotate(90deg); }
-}
-
-@keyframes morph-slow-magenta {
-  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-  100% { transform: translate(-5vw, -6vh) scale(1.05) rotate(-90deg); }
-}
-
-/* Staggered Focus Pull character animation */
-.focus-pull-char {
-  display: inline-block;
-  opacity: 0;
-  filter: blur(30px);
-  animation: focus-pull-in 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
-}
-
-@keyframes focus-pull-in {
-  to {
-    opacity: 1;
-    filter: blur(0px);
-  }
-}
-
-/* Infinite Scrolling Ticker */
-.ticker-wrap {
-  width: 100%;
-  overflow: hidden;
-  background-color: #0A0A0A;
-  color: #F0F0F0;
-  padding: 14px 0;
-  border-top: 1.5px solid rgba(255, 255, 255, 0.15);
-}
-
-.ticker {
-  display: flex;
-  white-space: nowrap;
-  animation: ticker-animation 30s linear infinite;
-}
-
-.ticker-item {
-  flex-shrink: 0;
-  padding: 0 20px;
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-@keyframes ticker-animation {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  100% {
-    transform: translate3d(-50%, 0, 0);
-  }
-}
-
-/* Custom Cursor - 12px, border: 2px solid #FF0090, scale to 24px + border color shifts to #AAFF00 on hover */
-.cursor-dot {
-  display: none; /* Removed dot to simplify visually aggressive cursor */
-}
-
-.cursor-ring {
-  width: 12px;
-  height: 12px;
-  background: transparent;
-  border: 2px solid #FF0090;
-  border-radius: 50%;
-  position: fixed;
-  pointer-events: none;
-  z-index: 10000;
-  transform: translate(-50%, -50%);
-  transition: transform 0.1s cubic-bezier(0.25, 1, 0.5, 1), width 0.2s ease, height 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
-}
-
-.cursor-ring-hovered {
-  width: 24px;
-  height: 24px;
-  border-color: #AAFF00;
-  background-color: rgba(170, 255, 0, 0.08);
-}
-
-.cursor-aura-glow {
-  display: none; /* Removed soft blurred aura trail to focus on aggressive elements */
-}
-
-/* Project Cards: Base #111111 with 1px border #333333 */
-.project-card {
-  position: relative;
-  background-color: #111111;
-  color: #FFFFFF;
-  border: 1px solid #333333;
-  border-radius: 6px;
-  transition: transform 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
-  overflow: hidden;
-}
-
-.project-card:hover {
-  transform: translateY(-8px);
-  border: 1px solid #FF0090; /* 1px solid #FF0090 on hover */
-}
-
-/* Iridescent hover gradient overlay: radial-gradient(circle at center, rgba(255,0,144,0.15), transparent 70%) */
-.project-card-wash {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at center, rgba(255, 0, 144, 0.15), transparent 70%);
-  opacity: 0;
-  z-index: 0;
-  transition: opacity 0.3s ease;
-  pointer-events: none;
-}
-
-.project-card:hover .project-card-wash {
-  opacity: 1;
-}
-
-.project-card-title {
-  color: #FFFFFF;
-  transition: color 0.3s ease;
-}
-
-.project-card:hover .project-card-title {
-  color: #AAFF00; /* title changes to #AAFF00 on hover */
-}
-
-/* Nav Pills: solid dark #111111 background, white text, 1px solid white border. On hover: bg -> #FF0090, text -> #000000 */
-.nav-pill-btn {
-  background-color: #111111 !important;
-  color: #FFFFFF !important;
-  border: 1px solid #FFFFFF !important;
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-
-.nav-pill-btn:hover {
-  background-color: #FF0090 !important;
-  color: #000000 !important;
-  border-color: #FF0090 !important;
-}
-
-/* Editorial Brackets */
-.editorial-bracket {
-  font-family: 'Space Grotesk', sans-serif;
-  color: #FF0090;
-  font-weight: 700;
+a:hover {
+  opacity: 0.8;
 }
