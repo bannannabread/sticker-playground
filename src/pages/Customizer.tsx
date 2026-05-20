@@ -77,7 +77,11 @@ const PRESET_STICKERS = [
   },
 ];
 
-export const Customizer: React.FC = () => {
+interface CustomizerProps {
+  onBack?: () => void;
+}
+
+export const Customizer: React.FC<CustomizerProps> = ({ onBack }) => {
   const canvasRef = useRef<HTMLDivElement>(null);
   const [stickers, setStickers] = useState<ActiveSticker[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -557,6 +561,15 @@ export const Customizer: React.FC = () => {
         {/* Brand Banner */}
         <div className="p-6 border-b border-white/10 flex items-center justify-between">
           <div className="flex items-center gap-3">
+            {onBack && (
+              <button
+                onClick={onBack}
+                className="p-2 hover:bg-white/5 border border-white/10 rounded-lg text-brand-cream/80 hover:text-white transition-all text-xs font-mono shrink-0 cursor-pointer"
+                title="Back to Portfolio"
+              >
+                ←
+              </button>
+            )}
             <div className="w-10 h-10 rounded-xl bg-brand-primary flex items-center justify-center font-display font-black text-brand-ink-black text-xl rotate-6 shadow-lg shadow-brand-primary/20">
               F
             </div>

@@ -1,10 +1,15 @@
-/* src/App.tsx */
-import { Customizer } from './pages/Customizer'
+import { useState } from 'react';
+import { Customizer } from './pages/Customizer';
+import { Portfolio } from './pages/Portfolio';
 
 function App() {
-  return (
-    <Customizer />
-  )
+  const [page, setPage] = useState<'portfolio' | 'customizer'>('portfolio');
+
+  if (page === 'customizer') {
+    return <Customizer onBack={() => setPage('portfolio')} />;
+  }
+
+  return <Portfolio onNavigateToCustomizer={() => setPage('customizer')} />;
 }
 
-export default App
+export default App;
