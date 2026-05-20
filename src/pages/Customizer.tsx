@@ -5,13 +5,17 @@ import {
   Plus, 
   Trash2, 
   Layers, 
-  RotateCw, 
   Download, 
   Grid, 
   Upload, 
-  RotateCcw,
-  Sparkles
+  Sparkles,
+  Tv,
+  Image as ImageIcon
 } from 'lucide-react';
+import { ShaderGradientCanvas, ShaderGradient } from '@shadergradient/react';
+import { StickerShowcase3D } from '../components/StickerShowcase3D';
+import { LiquidGlassContainer } from '../components/LiquidGlass/LiquidGlassContainer';
+import { LiquidGlassButton } from '../components/LiquidGlass/LiquidGlassButton';
 
 interface ActiveSticker {
   id: string;
@@ -22,14 +26,14 @@ interface ActiveSticker {
   stickerType: 'graphic' | 'label' | 'badge';
   colorTheme: 'yellow' | 'pink' | 'blue' | 'purple' | 'cream' | 'ink';
   size: 'sm' | 'md' | 'lg';
-  x: number; // relative to canvas width
-  y: number; // relative to canvas height
-  rotation: number; // degrees
-  scale: number; // multiplier
+  x: number;
+  y: number;
+  rotation: number;
+  scale: number;
   zIndex: number;
+  liquidMetal?: boolean;
 }
 
-// Preset library stickers
 const PRESET_STICKERS = [
   {
     id: 'preset-monkey',
@@ -39,6 +43,7 @@ const PRESET_STICKERS = [
     stickerType: 'graphic' as const,
     colorTheme: 'yellow' as const,
     size: 'md' as const,
+    liquidMetal: false,
   },
   {
     id: 'preset-cassette',
@@ -48,6 +53,7 @@ const PRESET_STICKERS = [
     stickerType: 'graphic' as const,
     colorTheme: 'pink' as const,
     size: 'md' as const,
+    liquidMetal: false,
   },
   {
     id: 'preset-rocket',
@@ -57,6 +63,7 @@ const PRESET_STICKERS = [
     stickerType: 'graphic' as const,
     colorTheme: 'blue' as const,
     size: 'md' as const,
+    liquidMetal: false,
   },
   {
     id: 'preset-coffee',
@@ -66,6 +73,7 @@ const PRESET_STICKERS = [
     stickerType: 'graphic' as const,
     colorTheme: 'purple' as const,
     size: 'md' as const,
+    liquidMetal: false,
   },
 ];
 
@@ -83,10 +91,12 @@ export const Customizer: React.FC = () => {
   const [newStickerType, setNewStickerType] = useState<'graphic' | 'label' | 'badge'>('label');
   const [newColorTheme, setNewColorTheme] = useState<'yellow' | 'pink' | 'blue' | 'purple' | 'cream' | 'ink'>('yellow');
   const [newSize, setNewSize] = useState<'sm' | 'md' | 'lg'>('md');
+  const [newLiquidMetal, setNewLiquidMetal] = useState(false);
 
   // Board settings
   const [boardTheme, setBoardTheme] = useState<'mesh' | 'ink' | 'cream' | 'grid'>('mesh');
   const [showGridLines, setShowGridLines] = useState(true);
+  const [viewMode, setViewMode] = useState<'2d' | '3d'>('2d');
 
   // Load from localstorage on mount
   useEffect(() => {
@@ -98,7 +108,6 @@ export const Customizer: React.FC = () => {
         console.error('Failed to parse saved stickers', e);
       }
     } else {
-      // Add default stickers
       setStickers([
         {
           id: 'default-1',
@@ -113,6 +122,7 @@ export const Customizer: React.FC = () => {
           rotation: -10,
           scale: 1,
           zIndex: 1,
+          liquidMetal: true,
         },
         {
           id: 'default-2',
@@ -127,6 +137,7 @@ export const Customizer: React.FC = () => {
           rotation: 12,
           scale: 1,
           zIndex: 2,
+          liquidMetal: false,
         },
         {
           id: 'default-3',
@@ -140,12 +151,12 @@ export const Customizer: React.FC = () => {
           rotation: 5,
           scale: 1.1,
           zIndex: 3,
+          liquidMetal: false,
         }
       ]);
     }
   }, []);
 
-  // Save to localstorage when stickers change
   const saveToLocalStorage = (newStickers: ActiveSticker[]) => {
     localStorage.setItem('frank-monkey-stickers', JSON.stringify(newStickers));
   };
@@ -155,12 +166,11 @@ export const Customizer: React.FC = () => {
     saveToLocalStorage(updated);
   };
 
-  // Add sticker to canvas
+  // Add preset sticker
   const addPresetSticker = (preset: typeof PRESET_STICKERS[0]) => {
     const canvas = canvasRef.current;
     const initialX = canvas ? canvas.clientWidth / 2 - 100 + Math.random() * 40 : 150;
     const initialY = canvas ? canvas.clientHeight / 2 - 100 + Math.random() * 40 : 150;
-
     const maxZ = stickers.length > 0 ? Math.max(...stickers.map(s => s.zIndex)) : 0;
 
     const newSticker: ActiveSticker = {
@@ -178,11 +188,11 @@ export const Customizer: React.FC = () => {
     setSelectedId(newSticker.id);
   };
 
+  // Add custom sticker
   const addCustomSticker = () => {
     const canvas = canvasRef.current;
     const initialX = canvas ? canvas.clientWidth / 2 - 100 + Math.random() * 40 : 150;
     const initialY = canvas ? canvas.clientHeight / 2 - 100 + Math.random() * 40 : 150;
-
     const maxZ = stickers.length > 0 ? Math.max(...stickers.map(s => s.zIndex)) : 0;
 
     const newSticker: ActiveSticker = {
@@ -198,6 +208,7 @@ export const Customizer: React.FC = () => {
       rotation: Math.floor(Math.random() * 30) - 15,
       scale: 1,
       zIndex: maxZ + 1,
+      liquidMetal: newLiquidMetal,
     };
 
     const updated = [...stickers, newSticker];
@@ -213,7 +224,6 @@ export const Customizer: React.FC = () => {
     const reader = new FileReader();
     reader.onload = (event) => {
       const result = event.target?.result as string;
-      
       const canvas = canvasRef.current;
       const initialX = canvas ? canvas.clientWidth / 2 - 100 + Math.random() * 40 : 150;
       const initialY = canvas ? canvas.clientHeight / 2 - 100 + Math.random() * 40 : 150;
@@ -232,6 +242,7 @@ export const Customizer: React.FC = () => {
         rotation: 0,
         scale: 1,
         zIndex: maxZ + 1,
+        liquidMetal: false,
       };
 
       const updated = [...stickers, newSticker];
@@ -243,6 +254,7 @@ export const Customizer: React.FC = () => {
 
   // Drag and drop event handlers
   const handleStickerMouseDown = (id: string, e: React.MouseEvent) => {
+    if (viewMode === '3d') return; // Disable drag/drop in 3D Mode
     e.stopPropagation();
     setSelectedId(id);
     setDraggedId(id);
@@ -255,7 +267,6 @@ export const Customizer: React.FC = () => {
       });
     }
 
-    // Bring clicked sticker to front dynamically
     const maxZ = Math.max(...stickers.map(s => s.zIndex), 0);
     const updated = stickers.map(s => {
       if (s.id === id) {
@@ -321,7 +332,6 @@ export const Customizer: React.FC = () => {
     if (!selectedId) return;
     const updated = stickers.map(s => {
       if (s.id === selectedId) {
-        // Clamp scale between 0.3 and 3
         const newScale = Math.max(0.3, Math.min(3, s.scale + factor));
         return { ...s, scale: newScale };
       }
@@ -356,14 +366,13 @@ export const Customizer: React.FC = () => {
 
     const width = board.clientWidth;
     const height = board.clientHeight;
-    canvasEl.width = width * 2; // high res
+    canvasEl.width = width * 2;
     canvasEl.height = height * 2;
     const ctx = canvasEl.getContext('2d');
     if (!ctx) return;
 
     ctx.scale(2, 2);
 
-    // 1. Draw Background
     if (boardTheme === 'ink') {
       ctx.fillStyle = '#1A1A2E';
       ctx.fillRect(0, 0, width, height);
@@ -371,7 +380,6 @@ export const Customizer: React.FC = () => {
       ctx.fillStyle = '#F5F0E8';
       ctx.fillRect(0, 0, width, height);
     } else {
-      // Mesh gradient fallback
       const grad = ctx.createLinearGradient(0, 0, width, height);
       grad.addColorStop(0, '#1A1A2E');
       grad.addColorStop(0.5, '#2D1B4E');
@@ -380,7 +388,6 @@ export const Customizer: React.FC = () => {
       ctx.fillRect(0, 0, width, height);
     }
 
-    // Draw grid lines if active
     if (showGridLines) {
       ctx.strokeStyle = boardTheme === 'cream' ? 'rgba(0, 0, 0, 0.05)' : 'rgba(255, 255, 255, 0.05)';
       ctx.lineWidth = 1;
@@ -399,7 +406,6 @@ export const Customizer: React.FC = () => {
       }
     }
 
-    // Helper to load image
     const loadImage = (src: string): Promise<HTMLImageElement> => {
       return new Promise((resolve, reject) => {
         const img = new Image();
@@ -410,36 +416,30 @@ export const Customizer: React.FC = () => {
       });
     };
 
-    // Sort stickers by zIndex before drawing
     const sortedStickers = [...stickers].sort((a, b) => a.zIndex - b.zIndex);
 
-    // 2. Draw each sticker
     for (const sticker of sortedStickers) {
       ctx.save();
 
-      // Sizing mapping (matches CSS width/height)
-      let stickerWidth = 192; // md: w-48
+      let stickerWidth = 192;
       let stickerHeight = 192;
       if (sticker.size === 'sm') {
-        stickerWidth = 144; // w-36
+        stickerWidth = 144;
         stickerHeight = 144;
       } else if (sticker.size === 'lg') {
-        stickerWidth = 256; // w-64
+        stickerWidth = 256;
         stickerHeight = 256;
       }
 
-      // Apply scale
       stickerWidth *= sticker.scale;
       stickerHeight *= sticker.scale;
 
-      // Center rotation point at sticker center
       const centerX = sticker.x + stickerWidth / 2;
       const centerY = sticker.y + stickerHeight / 2;
 
       ctx.translate(centerX, centerY);
       ctx.rotate((sticker.rotation * Math.PI) / 180);
 
-      // Draw background sticker base card
       ctx.fillStyle = 
         sticker.colorTheme === 'yellow' ? '#FFE033' :
         sticker.colorTheme === 'pink' ? '#FF2D78' :
@@ -450,8 +450,7 @@ export const Customizer: React.FC = () => {
       ctx.strokeStyle = '#1A1A2E';
       ctx.lineWidth = 4;
       
-      // Draw border box with rounded corners
-      const r = 16; // radius
+      const r = 16;
       const x = -stickerWidth / 2;
       const y = -stickerHeight / 2;
       const w = stickerWidth;
@@ -471,7 +470,6 @@ export const Customizer: React.FC = () => {
       ctx.fill();
       ctx.stroke();
 
-      // If sticker type is badge, draw dashed inner border
       if (sticker.stickerType === 'badge') {
         ctx.strokeStyle = '#1A1A2E';
         ctx.lineWidth = 3;
@@ -495,17 +493,15 @@ export const Customizer: React.FC = () => {
         ctx.quadraticCurveTo(ix, iy, ix + ir, iy);
         ctx.closePath();
         ctx.stroke();
-        ctx.setLineDash([]); // reset
+        ctx.setLineDash([]);
       }
 
-      // Draw image graphic if present
       if (sticker.stickerType === 'graphic' && sticker.imageSrc) {
         try {
           const img = await loadImage(sticker.imageSrc);
           const imgSize = stickerWidth * 0.65;
           ctx.drawImage(img, -imgSize / 2, -imgSize / 2 - 10, imgSize, imgSize);
         } catch (e) {
-          // Draw fallback emoji if image fails to load in canvas
           ctx.fillStyle = '#1A1A2E';
           ctx.font = `${stickerWidth * 0.25}px sans-serif`;
           ctx.textBaseline = 'middle';
@@ -520,17 +516,14 @@ export const Customizer: React.FC = () => {
         ctx.fillText('🐵', 0, -10);
       }
 
-      // Draw text values
       ctx.fillStyle = 
         sticker.colorTheme === 'yellow' || sticker.colorTheme === 'cream' ? '#1A1A2E' : '#F5F0E8';
       ctx.textAlign = 'center';
 
       if (sticker.stickerType === 'graphic') {
-        // Bottom Title
         ctx.font = `black ${Math.max(12, stickerWidth * 0.08)}px "Outfit", sans-serif`;
         ctx.fillText((sticker.title || '').toUpperCase(), 0, stickerHeight / 2 - 24);
       } else if (sticker.stickerType === 'label') {
-        // Label header & subtext
         ctx.font = `black italic ${Math.max(14, stickerWidth * 0.11)}px "Outfit", sans-serif`;
         ctx.fillText((sticker.title || '').toUpperCase(), 0, -5);
 
@@ -538,7 +531,6 @@ export const Customizer: React.FC = () => {
         ctx.font = `bold ${Math.max(8, stickerWidth * 0.05)}px "Inter", sans-serif`;
         ctx.fillText((sticker.subtitle || '').toUpperCase(), 0, stickerHeight / 2 - 50);
       } else if (sticker.stickerType === 'badge') {
-        // Simple badge centered text
         ctx.font = `black ${Math.max(14, stickerWidth * 0.1)}px "Outfit", sans-serif`;
         ctx.fillText((sticker.title || 'FRANK MONKEY').toUpperCase(), 0, 5);
       }
@@ -546,7 +538,6 @@ export const Customizer: React.FC = () => {
       ctx.restore();
     }
 
-    // Trigger download
     const url = canvasEl.toDataURL('image/png');
     const link = document.createElement('a');
     link.download = `frank-monkey-playground-${Date.now()}.png`;
@@ -555,6 +546,7 @@ export const Customizer: React.FC = () => {
   };
 
   const selectedSticker = stickers.find(s => s.id === selectedId);
+  const active3DSticker = selectedSticker || stickers[0];
 
   return (
     <div className="flex flex-col lg:flex-row min-h-screen w-full bg-brand-ink-black text-brand-cream overflow-hidden">
@@ -743,6 +735,19 @@ export const Customizer: React.FC = () => {
               </div>
             </div>
 
+            {/* Liquid Metal toggler for custom stickers */}
+            <div className="flex items-center justify-between p-2 rounded-lg bg-white/5 border border-white/10">
+              <span className="text-[10px] font-display font-black uppercase tracking-wider text-brand-cream/80">
+                Liquid Metal Chrome
+              </span>
+              <input 
+                type="checkbox"
+                checked={newLiquidMetal}
+                onChange={(e) => setNewLiquidMetal(e.target.checked)}
+                className="w-4 h-4 rounded border-white/10 accent-brand-primary focus:ring-brand-primary"
+              />
+            </div>
+
             {/* Generate Button */}
             <button
               onClick={addCustomSticker}
@@ -782,17 +787,21 @@ export const Customizer: React.FC = () => {
       {/* CENTRAL AREA: Playground Canvas Board */}
       <div className="flex-grow flex flex-col h-screen overflow-hidden relative">
         
-        {/* Workspace Toolbar Controls */}
-        <div className="w-full h-16 glass-panel border-b border-white/10 flex items-center justify-between px-6 z-20 shrink-0">
-          
+        {/* Workspace Toolbar Controls - Rendered using WebGL Refractive Liquid Glass! */}
+        <LiquidGlassContainer
+          type="rounded"
+          borderRadius={0}
+          tintOpacity={0.15}
+          className="w-full h-16 border-b border-white/10 flex items-center justify-between px-6 z-20 shrink-0"
+        >
           {/* Backdrop Board style selection */}
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-cream/55 mr-2">
-              Board Backdrop:
+            <span className="text-[10px] font-bold uppercase tracking-wider text-brand-cream/70 mr-2">
+              Backdrop Style:
             </span>
-            <div className="flex bg-brand-ink-black border border-white/10 p-0.5 rounded-lg">
+            <div className="flex bg-brand-ink-black/40 border border-white/10 p-0.5 rounded-lg">
               {([
-                { key: 'mesh', label: 'Holo Mesh' },
+                { key: 'mesh', label: 'Holo Mesh 3D' },
                 { key: 'ink', label: 'Ink Black' },
                 { key: 'cream', label: 'Cream Board' },
               ] as const).map((theme) => (
@@ -824,23 +833,51 @@ export const Customizer: React.FC = () => {
             </button>
           </div>
 
-          {/* Export & Reset Actions */}
-          <div className="flex items-center gap-3">
+          {/* View mode toggle: 2D Canvas vs 3D Showcase */}
+          <div className="flex items-center gap-1.5 bg-brand-ink-black/40 border border-white/10 p-0.5 rounded-xl">
             <button
-              onClick={clearAll}
-              className="px-4 py-2 border border-white/10 rounded-xl text-xs font-display font-black uppercase tracking-wider text-brand-cream/70 hover:text-brand-hot-pink hover:border-brand-hot-pink/30 hover:bg-brand-hot-pink/5 transition-all"
+              onClick={() => setViewMode('2d')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-display font-black uppercase tracking-wide transition-all ${
+                viewMode === '2d' 
+                  ? 'bg-brand-primary text-brand-ink-black' 
+                  : 'text-brand-cream/60 hover:text-brand-cream'
+              }`}
             >
-              Clear Board
+              <ImageIcon className="w-3.5 h-3.5" /> 2D Canvas
             </button>
             <button
-              onClick={exportCanvasAsPNG}
-              className="px-4 py-2 rounded-xl bg-brand-cream text-brand-ink-black font-display font-black uppercase tracking-wider text-xs flex items-center gap-2 hover:scale-[1.02] active:scale-95 transition-all shadow-lg"
+              onClick={() => setViewMode('3d')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-display font-black uppercase tracking-wide transition-all ${
+                viewMode === '3d' 
+                  ? 'bg-brand-primary text-brand-ink-black' 
+                  : 'text-brand-cream/60 hover:text-brand-cream'
+              }`}
             >
-              <Download className="w-4 h-4" /> Export Board (.PNG)
+              <Tv className="w-3.5 h-3.5" /> 3D Inspector
             </button>
           </div>
 
-        </div>
+          {/* Export & Reset Actions - Nested WebGL Buttons! */}
+          <div className="flex items-center gap-3">
+            <LiquidGlassButton
+              text="Reset"
+              size={12}
+              type="pill"
+              onClick={clearAll}
+              tintOpacity={0.4}
+              className="hover:scale-[1.03] active:scale-95 transition-all text-xs font-display font-black uppercase"
+            />
+            <LiquidGlassButton
+              text="Export"
+              size={12}
+              type="pill"
+              onClick={exportCanvasAsPNG}
+              tintOpacity={0.6}
+              warp={true}
+              className="hover:scale-[1.03] active:scale-95 transition-all text-xs font-display font-black uppercase text-brand-primary"
+            />
+          </div>
+        </LiquidGlassContainer>
 
         {/* The Sticker Workspace Board */}
         <div 
@@ -849,19 +886,38 @@ export const Customizer: React.FC = () => {
           onMouseUp={handleCanvasMouseUp}
           onMouseLeave={handleCanvasMouseUp}
           className={`flex-grow w-full relative overflow-hidden transition-all select-none ${
-            boardTheme === 'mesh' ? 'bg-gradient-to-tr from-[#1A1A2E] via-[#241A3E] to-[#121226]' :
+            boardTheme === 'mesh' ? 'bg-[#121226]' :
             boardTheme === 'ink' ? 'bg-[#1A1A2E]' : 'bg-[#F5F0E8]'
           }`}
         >
-          {/* Holo Mesh background details if active */}
+          {/* Animated 3D Shader Gradient behind the canvas */}
           {boardTheme === 'mesh' && (
-            <div className="absolute inset-0 pointer-events-none opacity-20 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-brand-hot-pink via-brand-holo-violet to-transparent" />
+            <div className="absolute inset-0 pointer-events-none z-0">
+              <ShaderGradientCanvas style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
+                <ShaderGradient
+                  {...({
+                    control: "props",
+                    color1: "#FFE033",
+                    color2: "#FF2D78",
+                    color3: "#9B5FFF",
+                    type: "plane",
+                    cAzimuthAngle: 180,
+                    cRGB1: [255, 224, 51],
+                    cRGB2: [255, 45, 120],
+                    cRGB3: [155, 95, 255],
+                    uSpeed: 0.0015,
+                    uStrength: 1.4,
+                    uDensity: 1.1,
+                  } as any)}
+                />
+              </ShaderGradientCanvas>
+            </div>
           )}
 
           {/* Grid Layout Overlay */}
           {showGridLines && (
             <div 
-              className="absolute inset-0 pointer-events-none opacity-[0.03]" 
+              className="absolute inset-0 pointer-events-none opacity-[0.03] z-1" 
               style={{
                 backgroundImage: boardTheme === 'cream' 
                   ? 'radial-gradient(circle, #000 1px, transparent 1px)' 
@@ -871,56 +927,107 @@ export const Customizer: React.FC = () => {
             />
           )}
 
-          {/* Render Active Stickers */}
-          {stickers.map((sticker) => (
-            <div
-              key={sticker.id}
-              style={{
-                position: 'absolute',
-                left: sticker.x,
-                top: sticker.y,
-                zIndex: sticker.zIndex,
-                transform: `scale(${sticker.scale}) rotate(${sticker.rotation}deg)`,
-                transformOrigin: 'center center',
-              }}
-              onMouseDown={(e) => handleStickerMouseDown(sticker.id, e)}
-              className={`absolute group cursor-move select-none p-1 rounded-2xl ${
-                selectedId === sticker.id ? 'ring-2 ring-brand-primary shadow-2xl ring-offset-4 ring-offset-brand-ink-black' : ''
-              }`}
-            >
-              <HoloSticker
-                stickerType={sticker.stickerType}
-                imageSrc={sticker.imageSrc}
-                title={sticker.title}
-                subtitle={sticker.subtitle}
-                badgeText={sticker.badgeText}
-                colorTheme={sticker.colorTheme}
-                size={sticker.size}
-              />
-            </div>
-          ))}
+          {/* 2D CANVAS VIEW MODE */}
+          {viewMode === '2d' && (
+            <>
+              {/* Render Active Stickers */}
+              {stickers.map((sticker) => (
+                <div
+                  key={sticker.id}
+                  style={{
+                    position: 'absolute',
+                    left: sticker.x,
+                    top: sticker.y,
+                    zIndex: sticker.zIndex,
+                    transform: `scale(${sticker.scale}) rotate(${sticker.rotation}deg)`,
+                    transformOrigin: 'center center',
+                  }}
+                  onMouseDown={(e) => handleStickerMouseDown(sticker.id, e)}
+                  className={`absolute group cursor-move select-none p-1 rounded-2xl ${
+                    selectedId === sticker.id ? 'ring-2 ring-brand-primary shadow-2xl ring-offset-4 ring-offset-brand-ink-black' : ''
+                  }`}
+                >
+                  <HoloSticker
+                    stickerType={sticker.stickerType}
+                    imageSrc={sticker.imageSrc}
+                    title={sticker.title}
+                    subtitle={sticker.subtitle}
+                    badgeText={sticker.badgeText}
+                    colorTheme={sticker.colorTheme}
+                    size={sticker.size}
+                    liquidMetal={sticker.liquidMetal}
+                  />
+                </div>
+              ))}
 
-          {stickers.length === 0 && (
-            <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none p-6">
-              <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-brand-primary animate-pulse mb-4">
-                <Sparkles className="w-8 h-8" />
-              </div>
-              <h3 className="font-display font-black text-xl uppercase tracking-wider text-brand-primary">
-                Canvas Empty
-              </h3>
-              <p className="text-xs text-brand-cream/40 uppercase tracking-widest mt-1">
-                Select or build stickers in the side menu to design
-              </p>
+              {stickers.length === 0 && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none p-6">
+                  <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-brand-primary animate-pulse mb-4">
+                    <Sparkles className="w-8 h-8" />
+                  </div>
+                  <h3 className="font-display font-black text-xl uppercase tracking-wider text-brand-primary">
+                    Canvas Empty
+                  </h3>
+                  <p className="text-xs text-brand-cream/40 uppercase tracking-widest mt-1">
+                    Select or build stickers in the side menu to design
+                  </p>
+                </div>
+              )}
+            </>
+          )}
+
+          {/* 3D INSPECTOR VIEW MODE */}
+          {viewMode === '3d' && (
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 z-10">
+              {active3DSticker ? (
+                <div className="w-full max-w-xl aspect-square flex flex-col items-center">
+                  <div className="w-full flex-grow relative">
+                    <StickerShowcase3D
+                      imageSrc={active3DSticker.imageSrc}
+                      title={active3DSticker.title}
+                      subtitle={active3DSticker.subtitle}
+                      badgeText={active3DSticker.badgeText}
+                      stickerType={active3DSticker.stickerType}
+                      colorTheme={active3DSticker.colorTheme}
+                    />
+                  </div>
+                  <div className="mt-4 text-center max-w-md">
+                    <h3 className="font-display font-black text-brand-primary uppercase tracking-wide">
+                      3D Specular & Iridescence Viewer
+                    </h3>
+                    <p className="text-[11px] text-brand-cream/60 uppercase tracking-widest mt-1">
+                      Drag over the sticker to tilt and see the realistic physical holographic shine react dynamically.
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center text-center p-6">
+                  <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center text-brand-primary mb-4">
+                    <Tv className="w-8 h-8" />
+                  </div>
+                  <h3 className="font-display font-black text-xl uppercase tracking-wider text-brand-primary">
+                    No Stickers on Board
+                  </h3>
+                  <p className="text-xs text-brand-cream/40 uppercase tracking-widest mt-1">
+                    Create or select a sticker first to view it in 3D
+                  </p>
+                </div>
+              )}
             </div>
           )}
 
         </div>
 
-        {/* Selected Sticker Interaction Panel */}
-        {selectedSticker && (
-          <div className="absolute bottom-6 left-1/2 transform -translate-x-1/2 glass-panel border border-white/15 px-6 py-4 rounded-2xl shadow-2xl z-30 flex items-center gap-6 animate-in slide-in-from-bottom duration-200">
-            
-            <div className="flex flex-col">
+        {/* Selected Sticker Interaction Panel - Rendered using WebGL Refractive Liquid Glass! */}
+        {selectedSticker && viewMode === '2d' && (
+          <LiquidGlassContainer
+            type="rounded"
+            borderRadius={24}
+            tintOpacity={0.25}
+            className="absolute bottom-6 left-1/2 border border-white/15 px-6 py-4 shadow-2xl z-30 flex items-center gap-6 animate-in slide-in-from-bottom duration-200"
+            style={{ transform: 'translateX(-50%)' }}
+          >
+            <div className="flex flex-col select-none">
               <span className="text-[9px] font-bold uppercase tracking-widest text-brand-cream/50">
                 Sticker Selected:
               </span>
@@ -933,83 +1040,111 @@ export const Customizer: React.FC = () => {
 
             {/* Transform Controls: Rotation */}
             <div className="flex items-center gap-2">
-              <span className="text-[9px] font-bold uppercase tracking-wider text-brand-cream/55">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-brand-cream/60">
                 Rotate:
               </span>
-              <button
+              <LiquidGlassButton
+                text="↺"
+                size={14}
+                type="circle"
                 onClick={() => adjustRotation(-15)}
-                className="p-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:text-brand-primary transition-all"
-                title="Rotate Left"
-              >
-                <RotateCcw className="w-3.5 h-3.5" />
-              </button>
-              <button
+                className="hover:scale-105 active:scale-95 transition-all text-xs"
+              />
+              <LiquidGlassButton
+                text="↻"
+                size={14}
+                type="circle"
                 onClick={() => adjustRotation(15)}
-                className="p-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:text-brand-primary transition-all"
-                title="Rotate Right"
-              >
-                <RotateCw className="w-3.5 h-3.5" />
-              </button>
+                className="hover:scale-105 active:scale-95 transition-all text-xs"
+              />
             </div>
 
             <div className="h-8 w-px bg-white/10" />
 
             {/* Transform Controls: Scale */}
             <div className="flex items-center gap-2">
-              <span className="text-[9px] font-bold uppercase tracking-wider text-brand-cream/55">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-brand-cream/60">
                 Scale:
               </span>
-              <button
+              <LiquidGlassButton
+                text="-"
+                size={14}
+                type="circle"
                 onClick={() => adjustScale(-0.1)}
-                className="px-2 py-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:text-brand-primary text-xs font-bold font-display"
-                title="Shrink"
-              >
-                -
-              </button>
-              <button
+                className="hover:scale-105 active:scale-95 transition-all text-xs font-bold"
+              />
+              <LiquidGlassButton
+                text="+"
+                size={14}
+                type="circle"
                 onClick={() => adjustScale(0.1)}
-                className="px-2 py-1 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:text-brand-primary text-xs font-bold font-display"
-                title="Grow"
-              >
-                +
-              </button>
+                className="hover:scale-105 active:scale-95 transition-all text-xs font-bold"
+              />
             </div>
 
             <div className="h-8 w-px bg-white/10" />
 
             {/* Layer arrangement */}
             <div className="flex items-center gap-2">
-              <span className="text-[9px] font-bold uppercase tracking-wider text-brand-cream/55">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-brand-cream/60">
                 Layer:
               </span>
-              <button
+              <LiquidGlassButton
+                text="▲ Front"
+                size={12}
+                type="pill"
                 onClick={() => adjustLayer('front')}
-                className="p-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:text-brand-primary transition-all flex items-center gap-1 text-[10px] font-bold font-display uppercase"
-                title="Bring to Front"
-              >
-                <Layers className="w-3.5 h-3.5" /> Front
-              </button>
-              <button
+                className="hover:scale-105 active:scale-95 transition-all text-[9px] font-black"
+              />
+              <LiquidGlassButton
+                text="▼ Back"
+                size={12}
+                type="pill"
                 onClick={() => adjustLayer('back')}
-                className="p-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 hover:text-brand-primary transition-all flex items-center gap-1 text-[10px] font-bold font-display uppercase"
-                title="Send to Back"
+                className="hover:scale-105 active:scale-95 transition-all text-[9px] font-black"
+              />
+            </div>
+
+            <div className="h-8 w-px bg-white/10" />
+
+            {/* Toggle Liquid Metal finish */}
+            <div className="flex items-center gap-2">
+              <span className="text-[9px] font-bold uppercase tracking-wider text-brand-cream/60">
+                Liquid Metal:
+              </span>
+              <button
+                onClick={() => {
+                  const updated = stickers.map(s => {
+                    if (s.id === selectedId) {
+                      return { ...s, liquidMetal: !s.liquidMetal };
+                    }
+                    return s;
+                  });
+                  updateStickersAndSave(updated);
+                }}
+                className={`px-2.5 py-1 rounded-lg border text-[10px] font-display font-black uppercase transition-all ${
+                  selectedSticker.liquidMetal
+                    ? 'border-brand-primary text-brand-primary bg-brand-primary/5'
+                    : 'border-white/10 text-brand-cream/50 hover:text-brand-cream'
+                }`}
               >
-                <Layers className="w-3.5 h-3.5" /> Back
+                {selectedSticker.liquidMetal ? 'On' : 'Off'}
               </button>
             </div>
 
             <div className="h-8 w-px bg-white/10" />
 
             {/* Delete button */}
-            <button
+            <LiquidGlassButton
+              text="✕"
+              size={14}
+              type="circle"
               onClick={deleteSelected}
-              className="p-1.5 rounded-lg bg-brand-hot-pink/10 border border-brand-hot-pink/20 text-brand-hot-pink hover:bg-brand-hot-pink/20 hover:scale-105 active:scale-95 transition-all"
-              title="Delete Sticker"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
+              tintOpacity={0.6}
+              className="hover:scale-110 active:scale-90 transition-all text-xs font-black text-brand-hot-pink"
+            />
 
-          </div>
+          </LiquidGlassContainer>
         )}
 
       </div>

@@ -1,6 +1,7 @@
 /* src/components/HoloSticker/HoloSticker.tsx */
 import React from 'react';
 import { useMouseTilt } from '../../hooks/useMouseTilt';
+import { LiquidMetal } from '@paper-design/shaders-react';
 import './holo.css';
 
 export interface HoloStickerProps {
@@ -14,6 +15,7 @@ export interface HoloStickerProps {
   className?: string;
   onClick?: () => void;
   style?: React.CSSProperties;
+  liquidMetal?: boolean;
 }
 
 export const HoloSticker: React.FC<HoloStickerProps> = ({
@@ -27,6 +29,7 @@ export const HoloSticker: React.FC<HoloStickerProps> = ({
   className = '',
   onClick,
   style: customStyle,
+  liquidMetal = false,
 }) => {
   const { ref, style: tiltStyle } = useMouseTilt(15);
 
@@ -47,6 +50,17 @@ export const HoloSticker: React.FC<HoloStickerProps> = ({
     ink: 'bg-brand-ink-black text-brand-cream border-2 border-brand-cream',
   };
 
+  // Color hex codes for the liquid metal tint
+  const colors = {
+    yellow: '#FFE033',
+    pink: '#FF2D78',
+    blue: '#1B8FFF',
+    purple: '#9B5FFF',
+    cream: '#F5F0E8',
+    ink: '#1A1A2E',
+  };
+  const themeColor = colors[colorTheme] || colors.yellow;
+
   return (
     <div
       ref={ref}
@@ -54,15 +68,44 @@ export const HoloSticker: React.FC<HoloStickerProps> = ({
       className={`holo-sticker-wrapper cursor-pointer active:scale-95 transition-transform duration-100 ${className}`}
       onClick={onClick}
     >
-      <div className={`holo-sticker-card ${sizeClasses[size]} ${themeClasses[colorTheme]}`}>
-        {/* Holographic reflection sheen */}
-        <div className="holo-sticker-sheen" />
-        
-        {/* Metallic surface highlights */}
-        <div className="holo-sticker-metallic" />
+      <div 
+        className={`holo-sticker-card ${sizeClasses[size]} ${
+          liquidMetal ? 'bg-brand-ink-black text-brand-cream overflow-hidden border-2 border-white/10' : themeClasses[colorTheme]
+        }`}
+      >
+        {liquidMetal ? (
+          <div className="absolute inset-0 w-full h-full z-0 pointer-events-none">
+            <LiquidMetal
+              image={stickerType === 'graphic' && imageSrc ? imageSrc : undefined}
+              shape={stickerType === 'graphic' && imageSrc ? "none" : "circle"}
+              colorBack="#1A1A2E"
+              colorTint={themeColor}
+              speed={0.4}
+              repetition={4}
+              softness={0.2}
+              distortion={0.5}
+              contour={0.8}
+              shiftRed={0.06}
+              shiftBlue={-0.06}
+              style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}
+            />
+          </div>
+        ) : (
+          <>
+            {/* Holographic reflection sheen */}
+            <div className="holo-sticker-sheen" />
+            
+            {/* Metallic surface highlights */}
+            <div className="holo-sticker-metallic" />
+          </>
+        )}
 
         {/* Content container raised in 3D */}
-        <div className="holo-sticker-content flex flex-col items-center justify-between h-full w-full select-none text-center">
+        <div 
+          className={`holo-sticker-content flex flex-col items-center justify-between h-full w-full select-none text-center z-10 ${
+            liquidMetal ? 'mix-blend-difference text-white' : ''
+          }`}
+        >
           
           {/* Badge top-bar */}
           {badgeText && (
@@ -75,16 +118,21 @@ export const HoloSticker: React.FC<HoloStickerProps> = ({
           {stickerType === 'graphic' && (
             <div className="flex flex-col items-center justify-center flex-grow w-full">
               {imageSrc ? (
-                <img
-                  src={imageSrc}
-                  alt={title || "Frank Monkey Sticker"}
-                  className="w-[70%] h-[70%] object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.5)] transform translateZ(10px) pointer-events-none"
-                />
+                // Only render transparent image if NOT liquid metal (since LiquidMetal shader handles the image representation itself)
+                !liquidMetal && (
+                  <img
+                    src={imageSrc}
+                    alt={title || "Frank Monkey Sticker"}
+                    className="w-[70%] h-[70%] object-contain drop-shadow-[0_8px_16px_rgba(0,0,0,0.5)] transform translateZ(10px) pointer-events-none"
+                  />
+                )
               ) : (
                 /* Default quirky monkey doodle fallback */
-                <div className="text-4xl filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.4)] transform translateZ(10px)">
-                  🐵
-                </div>
+                !liquidMetal && (
+                  <div className="text-4xl filter drop-shadow-[0_4px_8px_rgba(0,0,0,0.4)] transform translateZ(10px)">
+                    🐵
+                  </div>
+                )
               )}
               {title && (
                 <h3 className="font-display font-black tracking-tight text-center uppercase leading-none mt-3 text-lg transform translateZ(15px)">
