@@ -1,17 +1,17 @@
 /* src/pages/portfolio.css */
 
 .portfolio-container {
-  background-color: #F5F0E8;
-  color: #111111;
+  background-color: #080814;
+  color: #FFFFFF;
   font-family: 'Space Mono', monospace;
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
-  selection-background-color: #FF2D8B;
-  selection-color: #F5F0E8;
+  selection-background-color: #FF0090;
+  selection-color: #000000;
 }
 
-/* Film Grain Overlay - non-negotiable 15% opacity */
+/* Film Grain Overlay - 20% opacity fixed over everything */
 .film-grain-overlay {
   position: fixed;
   inset: 0;
@@ -19,47 +19,39 @@
   height: 100%;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.15;
+  opacity: 0.20;
   mix-blend-mode: overlay;
 }
 
-/* Chrome Liquid Metal Text (Silver -> White -> Dark Grey -> Silver) with sharp drop shadow */
+/* Chrome Liquid Metal Text (Molten silver/mercury with sharp drop shadow & metallic glow) */
 .chrome-text {
   font-family: 'Syne', sans-serif;
-  font-weight: 800;
+  font-weight: 900;
   line-height: 0.82;
+  letter-spacing: -0.02em;
   background: linear-gradient(
-    to bottom,
-    #777777 0%,
-    #dddddd 22%,
-    #ffffff 45%,
-    #111111 50%,
-    #555555 55%,
-    #cccccc 80%,
-    #888888 100%
+    180deg,
+    #ffffff 0%,
+    #c0c0c0 20%,
+    #ffffff 40%,
+    #808080 60%,
+    #ffffff 75%,
+    #404040 90%,
+    #c0c0c0 100%
   );
-  background-size: 100% 200%;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(8px 8px 0px #111111);
-  animation: chrome-shine 10s ease infinite alternate;
+  background-clip: text;
+  filter: drop-shadow(8px 8px 0px #000000);
+  text-shadow: 0 0 40px rgba(255, 255, 255, 0.4);
 }
 
-@keyframes chrome-shine {
-  0% {
-    background-position: 0% 0%;
-  }
-  100% {
-    background-position: 0% 100%;
-  }
-}
-
-/* Y2K Iridescent Accent Gradient - Pink to Lime Green */
+/* Hot Pink -> Lime Green horizontal accent gradient for Tagline */
 .building-things-gradient {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Space Mono', monospace;
   font-style: italic;
-  font-weight: 800;
-  background: linear-gradient(90deg, #FF2D8B 0%, #AAFF00 100%);
+  font-weight: bold;
+  background: linear-gradient(90deg, #FF0090, #AAFF00);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -69,53 +61,62 @@
   filter: url(#distress);
 }
 
-/* Morphing Background Blobs - Y2K Aura Colors bleeding softly */
+/* Saturated Neon Spray-Paint Background Blobs */
 .morphing-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(120px);
-  mix-blend-mode: multiply;
-  will-change: transform, border-radius;
+  filter: blur(80px);
+  opacity: 1;
   pointer-events: none;
+  will-change: transform, border-radius;
 }
 
 .blob-pink {
-  background: radial-gradient(circle, rgba(255,45,139,0.5) 0%, rgba(255,45,139,0) 70%);
-  animation: morph-slow 16s infinite alternate;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, #FF0090 0%, rgba(255, 0, 144, 0) 70%);
+  animation: morph-slow-pink 14s infinite alternate;
 }
 
 .blob-green {
-  background: radial-gradient(circle, rgba(170,255,0,0.45) 0%, rgba(170,255,0,0) 70%);
-  animation: morph-slow 20s infinite alternate-reverse;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #AAFF00 0%, rgba(170, 255, 0, 0) 70%);
+  animation: morph-slow-green 18s infinite alternate-reverse;
 }
 
 .blob-blue {
-  background: radial-gradient(circle, rgba(45,91,255,0.45) 0%, rgba(45,91,255,0) 70%);
-  animation: morph-slow 18s infinite alternate;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #2D5BFF 0%, rgba(45, 91, 255, 0) 70%);
+  animation: morph-slow-blue 16s infinite alternate;
 }
 
-.blob-cream {
-  background: radial-gradient(circle, rgba(245,240,232,0.6) 0%, rgba(245,240,232,0) 70%);
-  animation: morph-slow 22s infinite alternate-reverse;
+.blob-magenta {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, #CC00FF 0%, rgba(204, 0, 255, 0) 70%);
+  animation: morph-slow-magenta 20s infinite alternate-reverse;
 }
 
-@keyframes morph-slow {
-  0% {
-    border-radius: 38% 62% 65% 35% / 40% 45% 55% 60%;
-    transform: translate(0, 0) scale(1) rotate(0deg);
-  }
-  33% {
-    border-radius: 65% 35% 58% 42% / 55% 40% 60% 45%;
-    transform: translate(5vw, -8vh) scale(1.2) rotate(120deg);
-  }
-  66% {
-    border-radius: 45% 55% 38% 62% / 40% 60% 45% 55%;
-    transform: translate(-4vw, 6vh) scale(0.85) rotate(240deg);
-  }
-  100% {
-    border-radius: 38% 62% 65% 35% / 40% 45% 55% 60%;
-    transform: translate(0, 0) scale(1) rotate(360deg);
-  }
+@keyframes morph-slow-pink {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  100% { transform: translate(6vw, -8vh) scale(1.1) rotate(60deg); }
+}
+
+@keyframes morph-slow-green {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  100% { transform: translate(-8vw, 10vh) scale(1.15) rotate(-60deg); }
+}
+
+@keyframes morph-slow-blue {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  100% { transform: translate(4vw, 5vh) scale(0.9) rotate(90deg); }
+}
+
+@keyframes morph-slow-magenta {
+  0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+  100% { transform: translate(-5vw, -6vh) scale(1.05) rotate(-90deg); }
 }
 
 /* Staggered Focus Pull character animation */
@@ -137,10 +138,10 @@
 .ticker-wrap {
   width: 100%;
   overflow: hidden;
-  background-color: #111111;
-  color: #F5F0E8;
+  background-color: #0A0A0A;
+  color: #F0F0F0;
   padding: 14px 0;
-  border-top: 1px solid rgba(255,255,255,0.1);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.15);
 }
 
 .ticker {
@@ -168,105 +169,92 @@
   }
 }
 
-/* Custom Cursor Dot & Color-Cycling Ring/Aura */
+/* Custom Cursor - 12px, border: 2px solid #FF0090, scale to 24px + border color shifts to #AAFF00 on hover */
 .cursor-dot {
-  width: 8px;
-  height: 8px;
-  background-color: #111111;
+  display: none; /* Removed dot to simplify visually aggressive cursor */
+}
+
+.cursor-ring {
+  width: 12px;
+  height: 12px;
+  background: transparent;
+  border: 2px solid #FF0090;
   border-radius: 50%;
   position: fixed;
   pointer-events: none;
   z-index: 10000;
   transform: translate(-50%, -50%);
-  transition: transform 0.1s ease;
+  transition: transform 0.1s cubic-bezier(0.25, 1, 0.5, 1), width 0.2s ease, height 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
 }
 
-.cursor-ring {
-  width: 48px;
-  height: 48px;
-  border: 1.5px solid #FF2D8B;
-  border-radius: 50%;
-  position: fixed;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  animation: cursor-color-cycle 6s linear infinite;
-  transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1), width 0.3s ease, height 0.3s ease;
+.cursor-ring-hovered {
+  width: 24px;
+  height: 24px;
+  border-color: #AAFF00;
+  background-color: rgba(170, 255, 0, 0.08);
 }
 
 .cursor-aura-glow {
-  width: 140px;
-  height: 140px;
-  position: fixed;
-  pointer-events: none;
-  z-index: 9998;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  filter: blur(40px);
-  opacity: 0.28;
-  animation: cursor-glow-cycle 6s linear infinite;
+  display: none; /* Removed soft blurred aura trail to focus on aggressive elements */
 }
 
-@keyframes cursor-color-cycle {
-  0%, 100% { border-color: #FF2D8B; }
-  50% { border-color: #AAFF00; }
-}
-
-@keyframes cursor-glow-cycle {
-  0%, 100% { background: radial-gradient(circle, #FF2D8B 0%, rgba(0,0,0,0) 70%); }
-  50% { background: radial-gradient(circle, #AAFF00 0%, rgba(0,0,0,0) 70%); }
-}
-
-/* Card Styling - Sharp, 6px max radius */
+/* Project Cards: Base #111111 with 1px border #333333 */
 .project-card {
   position: relative;
   background-color: #111111;
-  color: #F5F0E8;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #FFFFFF;
+  border: 1px solid #333333;
   border-radius: 6px;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
+  transition: transform 0.3s ease, border-color 0.3s ease, background-color 0.3s ease;
   overflow: hidden;
 }
 
 .project-card:hover {
-  transform: translateY(-8px) scale(1.005);
-  border-color: #AAFF00; /* Thin Y2K border */
+  transform: translateY(-8px);
+  border: 1px solid #FF0090; /* 1px solid #FF0090 on hover */
 }
 
-/* On hover project cards: wash of hot pink -> lime green gradient at 60% opacity */
+/* Iridescent hover gradient overlay: radial-gradient(circle at center, rgba(255,0,144,0.15), transparent 70%) */
 .project-card-wash {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, #FF2D8B 0%, #AAFF00 100%);
+  background: radial-gradient(circle at center, rgba(255, 0, 144, 0.15), transparent 70%);
   opacity: 0;
   z-index: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.3s ease;
   pointer-events: none;
 }
 
 .project-card:hover .project-card-wash {
-  opacity: 0.6;
+  opacity: 1;
 }
 
-.project-card-aura {
-  position: absolute;
-  inset: -15px;
-  border-radius: 12px;
-  filter: blur(35px);
-  opacity: 0;
-  z-index: -1;
-  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: none;
+.project-card-title {
+  color: #FFFFFF;
+  transition: color 0.3s ease;
 }
 
-.project-card:hover .project-card-aura {
-  opacity: 0.5;
-  transform: scale(1.08);
+.project-card:hover .project-card-title {
+  color: #AAFF00; /* title changes to #AAFF00 on hover */
 }
 
-/* Editorial Brackets for Y2K style structure */
+/* Nav Pills: solid dark #111111 background, white text, 1px solid white border. On hover: bg -> #FF0090, text -> #000000 */
+.nav-pill-btn {
+  background-color: #111111 !important;
+  color: #FFFFFF !important;
+  border: 1px solid #FFFFFF !important;
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.nav-pill-btn:hover {
+  background-color: #FF0090 !important;
+  color: #000000 !important;
+  border-color: #FF0090 !important;
+}
+
+/* Editorial Brackets */
 .editorial-bracket {
   font-family: 'Space Grotesk', sans-serif;
-  color: #FF2D8B;
+  color: #FF0090;
   font-weight: 700;
 }
