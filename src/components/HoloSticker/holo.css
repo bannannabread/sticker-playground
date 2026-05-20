@@ -1,0 +1,96 @@
+/* src/components/HoloSticker/holo.css */
+
+.holo-sticker-wrapper {
+  position: relative;
+  display: inline-block;
+  user-select: none;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.holo-sticker-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--brand-ink-black);
+  border: 3px solid var(--brand-ink-black);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-sizing: border-box;
+  
+  /* Apply physical 3D rotation */
+  transform: perspective(1000px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transform-style: preserve-3d;
+  transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.15s ease;
+  
+  /* Calculate dynamic shadow direction based on tilt */
+  box-shadow: 
+    calc(var(--tilt-y, 0deg) * -0.3) 
+    calc(var(--tilt-x, 0deg) * 0.3) 
+    20px rgba(0, 0, 0, 0.4),
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.holo-sticker-card:hover {
+  border-color: var(--brand-cream);
+}
+
+/* Holographic sheen overlay */
+.holo-sticker-sheen {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  mix-blend-mode: color-dodge;
+  opacity: calc(var(--mouse-active, 0) * 0.85);
+  transition: opacity 0.3s ease;
+  z-index: 10;
+  background: conic-gradient(
+    from calc(var(--mouse-x, 0.5) * 360deg) at calc(var(--mouse-x, 0.5) * 100%) calc(var(--mouse-y, 0.5) * 100%),
+    #ff2d78 0%,
+    #1b8fff 15%,
+    #9b5fff 30%,
+    #ffe033 45%,
+    #ff2d78 60%,
+    #1b8fff 75%,
+    #9b5fff 90%,
+    #ff2d78 100%
+  );
+  filter: hue-rotate(calc(var(--mouse-x, 0.5) * 360deg)) brightness(1.3) contrast(1.25);
+  will-change: background, filter;
+}
+
+/* Metallic background texture */
+.holo-sticker-metallic {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.05) 0%,
+    rgba(255, 255, 255, 0.2) 25%,
+    rgba(0, 0, 0, 0.2) 50%,
+    rgba(255, 255, 255, 0.25) 75%,
+    rgba(255, 255, 255, 0.05) 100%
+  );
+  background-size: 200% 200%;
+  background-position: calc(var(--mouse-x, 0.5) * 100%) calc(var(--mouse-y, 0.5) * 100%);
+  mix-blend-mode: overlay;
+  z-index: 2;
+  transition: background-position 0.15s ease-out;
+}
+
+/* Inner contents */
+.holo-sticker-content {
+  position: relative;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform: translateZ(20px); /* Lift content off the surface in 3D */
+}

@@ -1,0 +1,56 @@
+/* src/index.css */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@700;900&display=swap');
+@import "../tokens/tokens.css";
+@import "tailwindcss";
+
+@theme {
+  /* Colors */
+  --color-brand-primary: var(--brand-primary);
+  --color-frank-yellow: var(--brand-primary);
+  --color-hot-pink: var(--brand-hot-pink);
+  --color-electric-blue: var(--brand-electric-blue);
+  --color-ink-black: var(--brand-ink-black);
+  --color-cream: var(--brand-cream);
+  --color-holo-violet: var(--brand-holo-violet);
+
+  /* Typography */
+  --font-display: var(--font-family-display);
+  --font-sans: var(--font-family-sans);
+
+  /* Border Radii */
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+}
+
+@layer base {
+  body {
+    background-color: var(--brand-ink-black);
+    color: var(--brand-cream);
+    font-family: var(--font-family-sans);
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-family-display);
+    font-weight: 700;
+  }
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: rgba(26, 26, 46, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glass-panel-light {
+  background: rgba(245, 240, 232, 0.8);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(26, 26, 46, 0.08);
+}
